@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "@types/jest": "^29.2.4",
+    "@types/node": "^18.11.16",
+    "ts-jest": "^29.0.3"
+  },
+  "dependencies": {
+    "jest": "^29.3.1"
+  },
+  "scripts": {
+    "start": "ts-node 2.ts",
+    "test": "jest",
+    "build": "tsc"
+  }
+}
