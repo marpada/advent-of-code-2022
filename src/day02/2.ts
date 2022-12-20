@@ -8,9 +8,6 @@ const choiceScore = {
   A: 1,
   B: 2,
   C: 3,
-  X: 1,
-  Y: 2,
-  Z: 3,
 };
 
 const gameScore = {
@@ -19,7 +16,7 @@ const gameScore = {
   LOSE: 0,
 };
 
-const score = (opponent: Choice, player: Choice): number => {
+export const score = (opponent: Choice, player: Choice): number => {
   let result: gameResult;
   switch (opponent) {
     case 'A': {
@@ -97,15 +94,18 @@ export function part1(data: string[]): number {
     const parts = line.split(' ');
     opponent = <Choice>parts[0];
     switch (parts[1]) {
-      case 'X': { // Rock
+      case 'X': {
+        // Rock
         player = 'A';
         break;
       }
-      case 'Y': { // Paper
+      case 'Y': {
+        // Paper
         player = 'B';
         break;
       }
-      case 'Z': { // Scissors
+      case 'Z': {
+        // Scissors
         player = 'C';
         break;
       }
@@ -120,11 +120,61 @@ export function part1(data: string[]): number {
 }
 
 export function part2(data: string[]): number {
-  return 0;
+  let totalScore = 0;
+  let opponent: Choice;
+  let player: Choice = 'A';
+  for (const line of data) {
+    const parts = line.split(' ');
+    opponent = <Choice>parts[0];
+    switch (parts[1]) {
+      case 'X': {
+        // Lose
+        switch (opponent) {
+          case 'A': { // Rock
+            player = 'C';
+            break;
+          }
+          case 'B': { // Paper
+            player = 'A';
+            break;
+          }
+          case 'C': { // Scissors
+            player = 'B';
+            break;
+          }
+        }
+			break
+      }
+      case 'Y': { // Draw
+        player = opponent;
+        break;
+      }
+      case 'Z': { // Win
+        switch (opponent) {
+          case 'A': { // Rock
+            player = 'B';
+            break;
+          }
+          case 'B': { // Paper
+            player = 'C';
+            break;
+          }
+          case 'C': { // Scissors
+            player = 'A';
+            break;
+          }
+        }
+			break
+      }
+    }
+    totalScore += score(opponent, player);
+  }
+  return totalScore;
 }
 
 if (require.main === module) {
   const rawData = readFileSync('input.txt', { encoding: 'utf8' });
   const data = rawData.split('\n').filter((line) => line);
   console.log(`Part 1 solution = ${part1(data)}`);
+  console.log(`Part 2 solution = ${part2(data)}`);
 }
