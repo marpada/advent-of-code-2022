@@ -2,89 +2,39 @@ import { readFileSync } from 'fs';
 
 type Choice = 'A' | 'B' | 'C';
 type secondColumnChoice = 'X' | 'Y' | 'Z';
-type gameResult = 'WIN' | 'LOSE' | 'DRAW';
+type GameResult = 'WIN' | 'LOSE' | 'DRAW';
 
-const choiceScore = {
-  A: 1,
-  B: 2,
-  C: 3,
-};
+export class Game {
+  static options: string = 'ABC';
 
-const gameScore = {
-  WIN: 6,
-  DRAW: 3,
-  LOSE: 0,
-};
-
-export const score = (opponent: Choice, player: Choice): number => {
-  let result: gameResult;
-  switch (opponent) {
-    case 'A': {
-      // Rock
-      switch (player) {
-        case 'A': {
-          // Rock
-          result = 'DRAW';
-          break;
-        }
-        case 'B': {
-          // Paper
-          result = 'WIN';
-          break;
-        }
-        case 'C': {
-          // Scissors
-          result = 'LOSE';
-          break;
-        }
-      }
-      break;
+  static score(opponent: Choice, player: Choice): number {
+    let resultScore: number;
+    if (opponent === player) {
+      resultScore = 3; // Draw
+    } else if (
+      (Game.options.indexOf(opponent) + 1) % Game.options.length ==
+      Game.options.indexOf(player)
+    ) {
+      resultScore = 6; // Win
+    } else {
+      resultScore = 0; // Lose
     }
-    case 'B': {
-      // Paper
-      switch (player) {
-        case 'A': {
-          // Rock
-          result = 'LOSE';
-          break;
-        }
-        case 'B': {
-          // Paper
-          result = 'DRAW';
-          break;
-        }
-        case 'C': {
-          // Scissors
-          result = 'WIN';
-          break;
-        }
-      }
-      break;
-    }
-    case 'C': {
-      // Scissors
-      switch (player) {
-        case 'A': {
-          // Rock
-          result = 'WIN';
-          break;
-        }
-        case 'B': {
-          // Paper
-          result = 'LOSE';
-          break;
-        }
-        case 'C': {
-          // Scissors
-          result = 'DRAW';
-          break;
-        }
-      }
-      break;
-    }
+    return resultScore + Game.options.indexOf(player) + 1;
   }
-  return gameScore[result] + choiceScore[player];
-};
+
+  static playerChoice(opponent: Choice, result: GameResult): Choice {
+    let playerPos: number;
+    if (result === 'DRAW') {
+      return opponent;
+    } else if (result == 'WIN') {
+      playerPos = (Game.options.indexOf(opponent) + 1) % Game.options.length;
+    } else {
+      // LOSE
+      playerPos = (Game.options.indexOf(opponent) + 2) % Game.options.length;
+    }
+    return <Choice>Game.options.at(playerPos);
+  }
+}
 
 export function part1(data: string[]): number {
   let totalScore = 0;
@@ -114,60 +64,25 @@ export function part1(data: string[]): number {
         break;
       }
     }
-    totalScore += score(opponent, player);
+    totalScore += Game.score(opponent, player);
   }
   return totalScore;
 }
 
 export function part2(data: string[]): number {
   let totalScore = 0;
-  let opponent: Choice;
-  let player: Choice = 'A';
+  // let opponent: Choice;
+  const results: Record<secondColumnChoice, GameResult> = {
+    'X': 'LOSE',
+    'Y': 'DRAW',
+    'Z': 'WIN',
+  };
   for (const line of data) {
     const parts = line.split(' ');
-    opponent = <Choice>parts[0];
-    switch (parts[1]) {
-      case 'X': {
-        // Lose
-        switch (opponent) {
-          case 'A': { // Rock
-            player = 'C';
-            break;
-          }
-          case 'B': { // Paper
-            player = 'A';
-            break;
-          }
-          case 'C': { // Scissors
-            player = 'B';
-            break;
-          }
-        }
-			break
-      }
-      case 'Y': { // Draw
-        player = opponent;
-        break;
-      }
-      case 'Z': { // Win
-        switch (opponent) {
-          case 'A': { // Rock
-            player = 'B';
-            break;
-          }
-          case 'B': { // Paper
-            player = 'C';
-            break;
-          }
-          case 'C': { // Scissors
-            player = 'A';
-            break;
-          }
-        }
-			break
-      }
-    }
-    totalScore += score(opponent, player);
+    const opponent = <Choice>parts[0];
+    const result = <secondColumnChoice>parts[1];
+    const player = Game.playerChoice(opponent, results[result]);
+    totalScore += Game.score(opponent, player);
   }
   return totalScore;
 }
