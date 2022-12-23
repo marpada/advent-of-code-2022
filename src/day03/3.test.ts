@@ -1,4 +1,4 @@
-import { part1, part2, priority, Rucksack } from './3';
+import { findBadge, part1, part2, priority, Rucksack } from './3';
 
 const data = [
   'vJrwpWtwJgWrhcsFMMfFFhFp',
@@ -37,8 +37,28 @@ describe('duplicates', () => {
   });
 });
 
+describe('common elements', () => {
+  test('First group', () => {
+    expect(findBadge(ruckSacks.slice(0, 3))).toBe('r');
+  });
+  test('Second group', () => {
+    expect(findBadge(ruckSacks.slice(3))).toBe('Z');
+  });
+  test('Fix item missed in third rucksack', () => {
+    let ruckSacks = [
+      'ZNNvFWHqLNPZHHqPTHHnTGBhrrpjvmwfMmpfpjBjwpmw',
+      'sbdzQgzgssgbglRtmjlwhjBlfrSrMt',
+      'zgsCRzJbsdRVQCDbcgLGWWLnZNGVLLZMNZnq',
+    ].map((r) => new Rucksack(r));
+    expect(findBadge(ruckSacks)).toBe('M');
+  });
+});
+
 describe('day3', () => {
-	test('part1', () => {
-		expect(part1(ruckSacks)).toBe(157)
-	})
-})
+  test('part1', () => {
+    expect(part1(ruckSacks)).toBe(157);
+  });
+  test('part2', () => {
+    expect(part2(ruckSacks)).toBe(70);
+  });
+});
