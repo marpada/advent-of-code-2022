@@ -22,7 +22,17 @@ export class SectionRange {
   }
 
   overlaps(other: SectionRange): boolean {
+    return (
+      (this.start >= other.start && this.start <= other.end) ||
+      (this.end >= other.start && this.end <= other.end)
+    );
+  }
+
+  rangesIncluded(other: SectionRange): boolean {
     return this.includes(other) || other.includes(this);
+  }
+  rangesOverlap(other: SectionRange): boolean {
+    return this.overlaps(other) || other.overlaps(this);
   }
 }
 
@@ -42,12 +52,27 @@ export class AssignmentsPair {
     );
   }
 
+  rangesIncluded(): boolean {
+    return this.assignment1.rangesIncluded(this.assignment2);
+  }
+
   rangesOverlap(): boolean {
-    return this.assignment1.overlaps(this.assignment2);
+    return this.assignment1.rangesOverlap(this.assignment2);
   }
 }
 
 export const part1 = (data: string[]): number => {
+  let count: number = 0;
+  for (let line of data) {
+    const pair = new AssignmentsPair(line);
+    if (pair.rangesIncluded()) {
+      count++;
+    }
+  }
+  return count;
+};
+
+export const part2 = (data: string[]): number => {
   let count: number = 0;
   for (let line of data) {
     const pair = new AssignmentsPair(line);
@@ -58,12 +83,9 @@ export const part1 = (data: string[]): number => {
   return count;
 };
 
-export const part2 = (data: string[]): number => {
-  return 0;
-};
-
 if (require.main === module) {
   const rawData = readFileSync('input.txt', { encoding: 'utf8' });
   const data = rawData.split('\n').filter((line) => line);
   console.log(`Part 1 solution = ${part1(data)}`);
+  console.log(`Part 2 solution = ${part2(data)}`);
 }
