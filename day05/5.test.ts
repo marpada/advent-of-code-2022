@@ -16,4 +16,7 @@ describe('day 5', () => {
   test('part 1', () => {
     expect(part1(data)).toBe('CMZ');
   });
+  test('part 2', () => {
+    expect(part2(data)).toBe('MCD');
+  });
 });

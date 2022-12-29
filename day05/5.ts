@@ -12,7 +12,7 @@ export class Crate {
 }
 
 class Movement {
-  constructor(public amount: number, public from: number, public to: number) {}
+  constructor(public amount: number, public from: number, public to: number) { }
 }
 
 export class Stack {
@@ -27,6 +27,9 @@ export class Stack {
     }
   }
   removeCrates(n: number = 1): Crate[] {
+    /** 
+     * Removes top n crates from the top of the stack as a block
+    **/
     let crates: Crate[] = [];
     for (let i = 0; i < n; i++) {
       if (this.items.length > 0) {
@@ -36,7 +39,7 @@ export class Stack {
         }
       }
     }
-    return crates;
+    return crates.reverse();
   }
 
   topCrateContent(): string {
@@ -47,11 +50,15 @@ export class Stack {
   }
 }
 
+type RemovalMethod = (stack: Stack, amount: number) => Crate[]
+
 class Crane {
   stacks: Stack[] = [];
   pendingMovements: Movement[] = [];
+  removalMethod: RemovalMethod
   tempCrateList: Crate[][] = [];
-  constructor(data: string[]) {
+  constructor(data: string[], removalMethod: RemovalMethod) {
+    this.removalMethod = removalMethod
     type mode = 'PARSE_CONTAINERS' | 'PARSE_MOVEMENTS' | 'PARSE_STACKS';
     let currentMode: mode = 'PARSE_CONTAINERS';
     for (let line of data) {
@@ -108,6 +115,22 @@ class Crane {
     }
   }
 
+
+  static removeCratesSequentially(stack: Stack, amount: number = 1): Crate[] {
+    let crates: Crate[] = []
+    for (let i = 0; i < amount; i++) {
+      let removedCrates = stack.removeCrates()
+      if (removedCrates.length === 1) {
+        crates.push(removedCrates[0])
+      }
+    }
+    return crates
+  }
+
+  static removeBlockOfCrates(stack: Stack, amount: number = 1): Crate[] {
+    return stack.removeCrates(amount)
+  }
+
   parseMovement(line: string): void {
     const regex = /move (\d+) from (\d) to (\d)/g;
     const results = Array.from(line.matchAll(regex));
@@ -122,9 +145,8 @@ class Crane {
     while (this.pendingMovements.length > 0) {
       let movement = this.pendingMovements.shift();
       if (movement) {
-        let movedCrates = this.stacks[movement.from - 1].removeCrates(
-          movement.amount
-        );
+        let movedCrates = this.removalMethod(this.stacks[movement.from - 1], movement.amount)
+        //);
         this.stacks[movement.to - 1].addCrates(movedCrates);
       }
     }
@@ -133,7 +155,7 @@ class Crane {
 
 export const part1 = (data: string[]): string => {
   let output = '';
-  let crane = new Crane(data);
+  let crane = new Crane(data, Crane.removeCratesSequentially); //		CrateMover 9000
   for (let s of crane.stacks) {
     output += s.topCrateContent();
   }
@@ -141,11 +163,17 @@ export const part1 = (data: string[]): string => {
 };
 
 export const part2 = (data: string[]): string => {
-  return '';
+  let output = '';
+  let crane = new Crane(data, Crane.removeBlockOfCrates); //	CrateMover 9001
+  for (let s of crane.stacks) {
+    output += s.topCrateContent();
+  }
+  return output;
 };
 
 if (require.main === module) {
   const rawData = readFileSync('input.txt', { encoding: 'utf8' });
   const data = rawData.split('\n').filter((line) => line);
   console.log(`Part 1 solution = ${part1(data)}`);
+  console.log(`Part 2 solution = ${part2(data)}`);
 }
