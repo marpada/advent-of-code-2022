@@ -28,10 +28,15 @@ const markerPosition = (buffer: string, markerLength: number = 4): number => {
 
 
 export const part1 = (data: string): number => {
-  return markerPosition(data)
+  return markerPosition(data, 4)
+}
+
+export const part2 = (data: string): number => {
+  return markerPosition(data, 14)
 }
 
 if (require.main === module) {
   const data = readFileSync('input.txt', { encoding: 'utf8' });
   console.log(`Part 1 solution = ${part1(data)}`);
+  console.log(`Part 2 solution = ${part2(data)}`);
 }
