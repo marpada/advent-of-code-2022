@@ -109,7 +109,29 @@ export const part1 = (data: string[]): number => {
   }
 }
 
+
+export const part2 = (data: string[]): number => {
+  const SPACE_AVAILABLE = 70000000
+  const SPACE_REQUIRED = 30000000
+  const d = (new Parser()).parse(data)
+  if (d) {
+    const dirSizes = d.dirSizes()
+    const spaceUsed = dirSizes['/']
+    const spaceFree = SPACE_AVAILABLE - spaceUsed
+    let minSpace = spaceUsed
+    for (let space of Object.values(dirSizes)) {
+      if (spaceFree + space >= SPACE_REQUIRED && space < minSpace) {
+
+        minSpace = space
+      }
+    }
+    return minSpace
+  }
+  return -1
+}
+
 if (require.main === module) {
   const data = readFileSync('input.txt', { encoding: 'utf8' }).split("\n").filter((line) => line);
   console.log(`Part 1 solution = ${part1(data)}`);
+  console.log(`Part 2 solution = ${part2(data)}`);
 }

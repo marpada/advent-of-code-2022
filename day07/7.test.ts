@@ -1,4 +1,4 @@
-import { part1 } from "./7";
+import { part1, part2 } from "./7";
 
 const data = [
   '$ cd /',
@@ -29,5 +29,8 @@ const data = [
 describe('Day 7', () => {
   test('Part1', () => {
     expect(part1(data)).toBe(95437)
+  })
+  test('Part2', () => {
+    expect(part2(data)).toBe(24933642)
   })
 })
